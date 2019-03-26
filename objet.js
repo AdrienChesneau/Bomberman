@@ -9,18 +9,14 @@ class Objet {
         Object.defineProperty(this, "destr", {value : destr, writable : false});
     }
 
-    hasCollision = function(player, obj){
-        return(! (obj.x >= player.x + player.width || 
-            obj.x + obj.width <= player.x || 
-            obj.y >= player.y + player.height || 
-            obj.y + obj.height <= player.y) )
+    hasCollision = function(obj){
+        return(! (obj.x >= this.x + this.width || 
+            obj.x + obj.width <= this.x || 
+            obj.y >= this.y + this.height || 
+            obj.y + obj.height <= this.y) )
     }
 
-    getCollision = function(player, obj){
-        let pos = {x:-1, y:-1, width:-1, height:-1};
-        if(player.hasCollision(obj)) {
-            pos = {x:obj.x, y:obj.y, width:obj.width, height:elem.height};
-        }
-        return pos;
+    getCollision = function(){
+        return {x:this.x, y:this.y, width:this.width, height:this.height};
     }
 }

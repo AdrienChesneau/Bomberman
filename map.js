@@ -42,14 +42,16 @@ let draw = function (){
     });
     player = new Image();
     player.src = player1.src;
-    console.log(player1.x +" "+player1.y);
+    // console.log(player1.x +" "+player1.y);
     context.drawImage(player,player1.x,player1.y,player1.width,player1.height);
 }
 
 let collision = function(player, elem_list){
-    let pos = {x:-1, y:-1, width:-1, height:-1};
+    let pos = {x:-1, y:-1, width:-1, height:-1}
     elem_list.forEach(elem => {
-        pos = player.getCollision(elem);
+        if (player.hasCollision(elem)){
+            pos = elem.getCollision(); 
+        }
     });
     return pos;
 }
@@ -60,8 +62,6 @@ let keyboard = function (e) {
         case 90:
             player1.y= player1.y-player1.speed; 
             pos = collision(player1, block_list);
-            // console.log(pos);
-            // console.log(pos.x + " " + pos.y);
             if(pos.x !== -1 || pos.y !== -1){
                 player1.y = pos.y+pos.height;
             }
@@ -69,8 +69,6 @@ let keyboard = function (e) {
         case 81:
             player1.x= player1.x-player1.speed;
             pos = collision(player1, block_list);
-            // console.log(pos);
-            // console.log(pos.x + " " + pos.y);
             if(pos.x !== -1 || pos.y !== -1){
                 player1.x = pos.x+pos.width; 
             }
@@ -78,8 +76,6 @@ let keyboard = function (e) {
         case 83:
             player1.y= player1.y+player1.speed;
             pos = collision(player1, block_list);
-            // console.log(pos);
-            // console.log(pos.x + " " + pos.y);
             if(pos.x !== -1 || pos.y !== -1){
                 player1.y = pos.y-player.height; 
             }
@@ -87,8 +83,6 @@ let keyboard = function (e) {
         case 68:
             player1.x= player1.x+player1.speed;
             pos = collision(player1, block_list);
-            // console.log(pos);
-            // console.log(pos.x + " " + pos.y);
             if(pos.x !== -1 || pos.y !== -1){
                 player1.x= pos.x-player.width; 
             }
