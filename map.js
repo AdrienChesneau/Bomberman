@@ -2,9 +2,20 @@ let canvas = document.getElementById("cvn");
 let context = canvas.getContext("2d");
 
 // let player1 = new Objet("player1.png", 10, 10, 0, 0, 15, 22, 8, true);
-let player1 = new Objet("sprites/player1/forward1.png", 10, 10, 0, 0, 32, 48, 8, true);
+let player1 = new Objet("sprites/player1/forward0.png", 10, 10, 0, 0, 32, 48, 8, 0, true);
 let map = [];
-let walls = []
+let walls = [];
+let forward_tab = [];
+let backward_tab = [];
+let left_tab = [];
+let right_tab = [];
+for(let i=0; i<9; i++){
+    forward_tab.push("sprites/player1/forward"+i+".png");
+    backward_tab.push("sprites/player1/backward"+i+".png");
+    left_tab.push("sprites/player1/left"+i+".png");
+    right_tab.push("sprites/player1/right"+i+".png");
+}
+let sprite_tab = forward_tab;
 
 let wall1 = new Objet("", 0, 0, 0, 0, 800, 0, 0, false);
 let wall2 = new Objet("", 800, 0, 0, 0, 0, 600, 0, false);
@@ -16,7 +27,7 @@ walls.push(wall3);
 walls.push(wall4);
 
 // let json = '{ "lvl1" : "000000000000000001010101101010100000000000000000010101011010101000000000000000000101010110101010010101011010101000000000000000000101010110101010000000000000000001010101101010100000000000000000" }';
-let json = '{ "lvl1" : "000000000000000001210121121012100000000000000000012101211210121000000000000000000121012113101210012101211210121000000000000000000121012112101210000000000000000001210121121012100000000000000000" }';
+let json = '{ "lvl1" : "000000000000000001210121121012100000000000000000012101211210121000000000000000000121012112101210012101211210121000000000000000000121012112101210000000000000000001210121121012100000000000000000" }';
 
 let init_map = function(){
     for(let i = 0; i < 12; i++){
@@ -43,6 +54,7 @@ let parser= function(pathname){
                 map[i][j].addObj(tree);
             }
             if(lvl[i]==3){
+                // Ne s'affiche pas
                 victory = new Objet("sprites/decor/tree.png", j*50, i*50, i, j, 50, 50, 0, true);
                 map[i][j].addObj(victory);
             }
@@ -67,7 +79,7 @@ let draw = function (){
     });
 
     player = new Image();
-    player.src = player1.src;
+    player.src = sprite_tab[player1.sprite];
     // console.log(player1.x +" "+player1.y);
     context.drawImage(player,player1.x,player1.y,player1.width,player1.height);
 }
@@ -95,13 +107,17 @@ let keyboard = function (e) {
     let pos = {x:-1, y:-1, width:-1, height:-1};
     switch (e.keyCode){
         case 90:
+            player1.sprite = (player1.sprite+1)%8;
+            sprite_tab = backward_tab;
             player1.y= player1.y-player1.speed; 
             pos = collision(player1, map);
             if(pos.x !== -1 || pos.y !== -1){
-                player1.y = pos.y+pos.height;
+                player1.y = pos.y + Math.trunc(pos.height/2) + 1;
             }
             break;
         case 81:
+            player1.sprite = (player1.sprite+1)%8;
+            sprite_tab = left_tab;
             player1.x= player1.x-player1.speed;
             pos = collision(player1, map);
             if(pos.x !== -1 || pos.y !== -1){
@@ -109,6 +125,8 @@ let keyboard = function (e) {
             }
             break;
         case 83:
+            player1.sprite = (player1.sprite+1)%8;
+            sprite_tab = forward_tab;
             player1.y= player1.y+player1.speed;
             pos = collision(player1, map);
             if(pos.x !== -1 || pos.y !== -1){
@@ -116,6 +134,8 @@ let keyboard = function (e) {
             }
             break;
         case 68:
+            player1.sprite = (player1.sprite+1)%8;
+            sprite_tab = right_tab;
             player1.x= player1.x+player1.speed;
             pos = collision(player1, map);
             if(pos.x !== -1 || pos.y !== -1){
