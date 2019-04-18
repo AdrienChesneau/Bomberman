@@ -1,5 +1,5 @@
 class Objet {
-    constructor(src, x, y, i, j, width, height, speed, destr){
+    constructor(src, x, y, i, j, width, height, speed, sprite, destr){
         Object.defineProperty(this, "src", {value : src, writable : true});
         Object.defineProperty(this, "x", {value : x, writable : true});
         Object.defineProperty(this, "y", {value : y, writable : true});
@@ -8,6 +8,7 @@ class Objet {
         Object.defineProperty(this, "width", {value : width, writable : false});
         Object.defineProperty(this, "height", {value : height, writable : false});
         Object.defineProperty(this, "speed", {value : speed, writable : false});
+        Object.defineProperty(this, "sprite", {value : sprite, writable : true});
         Object.defineProperty(this, "destr", {value : destr, writable : false});
     }
 
@@ -15,7 +16,7 @@ class Objet {
         return(! (obj.x >= this.x + this.width || 
             obj.x + obj.width <= this.x || 
             obj.y >= this.y + this.height || 
-            obj.y + obj.height <= this.y) )
+            obj.y + obj.height <= this.y+(Math.trunc(this.height/2)+1)) )
     }
 
     getCollision = function(){
@@ -27,6 +28,6 @@ class Objet {
     }
 
     getCoord = function(){
-        return [i,j];
+        return [this.i,this.j];
     }
 }
