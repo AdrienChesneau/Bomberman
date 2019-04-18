@@ -13,6 +13,12 @@ class Objet {
     }
 
     hasCollision = function(obj){
+        if(obj.src==""){
+            return(! (obj.x >= this.x + this.width || 
+                obj.x + obj.width <= this.x || 
+                obj.y >= this.y + this.height || 
+                obj.y + obj.height <= this.y) )
+        }
         return(! (obj.x >= this.x + this.width || 
             obj.x + obj.width <= this.x || 
             obj.y >= this.y + this.height || 
