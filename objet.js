@@ -24,10 +24,23 @@ class Objet {
     }
 
     dropBomb = function(){
-        return new Objet("bomb.png", (this.i*75)-2, (this.j*75)-2, this.i, this.j, 4, 4, 0, false);
+        return new Objet("sprites/decor/bomb0.png", (this.j*50)+10, (this.i*50)+10, this.i, this.j, 30, 30, 0, 0, false);
     }
 
     getCoord = function(){
         return [this.i,this.j];
+    }
+
+    updateCoord = function(){
+        this.i = Math.trunc((this.y+this.width/2)/50);
+        this.j = Math.trunc((this.x+this.height/2)/50);
+    }
+
+    isBomb = function(){
+        return (this.src == "sprites/decor/bomb0.png" || this.src == "sprites/decor/bomb1.png");
+    }
+
+    getSprite = function(val){
+        return Math.trunc(this.sprite/val)%2; 
     }
 }

@@ -16,4 +16,14 @@ class Case {
     getObj = function(){
         return this.objet;
     }
+
+    destroy = function(){
+        if (this.objet != null){
+            if(this.obj.destr){
+                this.objet = null;
+            }
+            return true;
+        }
+        return false;
+    }
 }

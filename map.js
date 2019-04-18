@@ -17,6 +17,9 @@ for(let i=0; i<9; i++){
 }
 let sprite_tab = forward_tab;
 
+let sprites_bomb = ["sprites/decor/bomb0.png", "sprites/decor/bomb1.png"];
+
+
 let wall1 = new Objet("", 0, 0, 0, 0, 800, 0, 0, false);
 let wall2 = new Objet("", 800, 0, 0, 0, 0, 600, 0, false);
 let wall3 = new Objet("", 0, 600, 0, 0, 800, 0, 0, false);
@@ -46,22 +49,45 @@ let parser= function(pathname){
    for(let i=0; i<map.length; i++){
        for (let j = 0; j < map[i].length; j++){
             if(lvl[k]==1){
-                block = new Objet("sprites/decor/block.png", j*50, i*50, i, j, 50, 50, 0, false);
+                block = new Objet("sprites/decor/block.png", j*50, i*50, i, j, 50, 50, 0, 0, false);
                 map[i][j].addObj(block);
             }
             if(lvl[k]==2){
-                tree = new Objet("sprites/decor/tree.png", j*50, i*50, i, j, 50, 50, 0, true);
+                tree = new Objet("sprites/decor/tree.png", j*50, i*50, i, j, 50, 50, 0, 0, true);
                 map[i][j].addObj(tree);
             }
             if(lvl[i]==3){
                 // Ne s'affiche pas
-                victory = new Objet("sprites/decor/tree.png", j*50, i*50, i, j, 50, 50, 0, true);
+                victory = new Objet("sprites/decor/tree.png", j*50, i*50, i, j, 50, 50, 0, 0, true);
                 map[i][j].addObj(victory);
             }
             k++;
         }
    }
 }   
+
+let explosion = function(i, j){
+    
+    map[i][j].removeObj();
+    
+    console.log(map[i-1][j]);
+    if(! map[i-1][j].destroy()){
+        map[i-2][j].destroy();
+    }
+    console.log(map[i+1][j]);
+    if(! map[i+1][j].destroy()){
+        map[i+2][j].destroy();
+    }
+    console.log(map[i][j-1]);
+    if(! map[i][j-1].destroy()){
+        map[i][j-2].destroy();
+    }
+    console.log(map[i][j+1]);
+    if(map[i][j+1].destroy()){
+        map[i][j+2].destroy();
+    }
+    
+}
 
 let draw = function (){
     let background = new Image();
@@ -72,7 +98,18 @@ let draw = function (){
             let o = c.getObj();
             if (o != null){
                 let img = new Image();
+                if (o.isBomb()) { 
+                    o.sprite = o.sprite + 1;
+                    if (o.sprite == 180) {
+                        explosion(o.i, o.j); 
+                    } else {
+                        if (o.sprite%20 == 0) {
+                            o.src = sprites_bomb[o.getSprite(20)];
+                        }
+                    }
+                }
                 img.src = o.src;
+                
                 context.drawImage(img,o.x,o.y,o.width,o.height);
             }
         });
@@ -114,6 +151,7 @@ let keyboard = function (e) {
             if(pos.x !== -1 || pos.y !== -1){
                 player1.y = pos.y + Math.trunc(pos.height/2) + 1;
             }
+            player1.updateCoord();
             break;
         case 81:
             player1.sprite = (player1.sprite+1)%8;
@@ -123,6 +161,7 @@ let keyboard = function (e) {
             if(pos.x !== -1 || pos.y !== -1){
                 player1.x = pos.x+pos.width; 
             }
+            player1.updateCoord();
             break;
         case 83:
             player1.sprite = (player1.sprite+1)%8;
@@ -132,6 +171,7 @@ let keyboard = function (e) {
             if(pos.x !== -1 || pos.y !== -1){
                 player1.y = pos.y-player.height; 
             }
+            player1.updateCoord();
             break;
         case 68:
             player1.sprite = (player1.sprite+1)%8;
@@ -141,12 +181,16 @@ let keyboard = function (e) {
             if(pos.x !== -1 || pos.y !== -1){
                 player1.x= pos.x-player.width; 
             }
+            player1.updateCoord();
             break;
         case 69:
             // console.log(map);
-            let i = player1.getCase[0];
-            let j = player1.getCase[1];
-            map[i][j].addObj(player1.dropBomb());
+            let i = player1.getCoord()[0];
+            let j = player1.getCoord()[1];
+            //console.log(i + " " + j);
+            if (map[i][j].getObj() == null){
+                map[i][j].addObj(player1.dropBomb());
+            }
     }
 };
 
