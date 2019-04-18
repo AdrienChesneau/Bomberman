@@ -13,6 +13,12 @@ class Objet {
     }
 
     hasCollision = function(obj){
+        if(obj.src==""){
+            return(! (obj.x >= this.x + this.width || 
+                obj.x + obj.width <= this.x || 
+                obj.y >= this.y + this.height || 
+                obj.y + obj.height <= this.y) )
+        }
         return(! (obj.x >= this.x + this.width || 
             obj.x + obj.width <= this.x || 
             obj.y >= this.y + this.height || 
@@ -24,7 +30,7 @@ class Objet {
     }
 
     dropBomb = function(){
-        return new Objet("bomb.png", (this.i*75)-2, (this.j*75)-2, this.i, this.j, 4, 4, 0, false);
+        return new Objet("sprites/decor/bomb0.png", (this.i*75)-2, (this.j*75)-2, this.i, this.j, 30, 30, 0, 0, false);
     }
 
     getCoord = function(){
