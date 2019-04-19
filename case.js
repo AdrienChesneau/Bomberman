@@ -19,7 +19,8 @@ class Case {
 
     destroy = function(){
         if (this.objet != null){
-            if(this.obj.destr){
+            if(this.objet.destr){
+                console.log(this.objet.i+" "+this.objet.j);
                 this.objet = null;
             }
             return true;

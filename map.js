@@ -1,6 +1,6 @@
 let canvas = document.getElementById("cvn");
 let context = canvas.getContext("2d");
-
+let BreakException = {};
 // let player1 = new Objet("player1.png", 10, 10, 0, 0, 15, 22, 8, true);
 let player1 = new Objet("sprites/player1/forward0.png", 10, 10, 0, 0, 32, 48, 8, 0, true);
 let map = [];
@@ -56,7 +56,6 @@ let parser= function(pathname){
                 map[i][j].addObj(tree);
             }
             if(lvl[k]==3){
-                // Ne s'affiche pas
                 victory = new Objet("sprites/decor/tree.png", j*50, i*50, i, j, 50, 50, 0, 0, true);
                 map[i][j].addObj(victory);
             }
@@ -66,25 +65,35 @@ let parser= function(pathname){
 }   
 
 let explosion = function(i, j){
-    
     map[i][j].removeObj();
     
-    console.log(map[i-1][j]);
-    if(! map[i-1][j].destroy()){
-        map[i-2][j].destroy();
+    if(player1.inRange(i, j)){return false;}
+
+    if(i-1>=0 && !map[i-1][j].destroy()){
+        if(i-2>=0){
+            if(player1.i == i-2 && player1.j == j){return false; }
+            else{map[i-2][j].destroy();}
+        }
     }
-    console.log(map[i+1][j]);
-    if(! map[i+1][j].destroy()){
-        map[i+2][j].destroy();
+    if(i+1<=15 && !map[i+1][j].destroy()){
+        if(i+2<=15){
+            if(player1.i == i+2 && player1.j == j){return false;}
+            else{map[i+2][j].destroy();}
+        }
     }
-    console.log(map[i][j-1]);
-    if(! map[i][j-1].destroy()){
-        map[i][j-2].destroy();
+    if(j-1>=0 && !map[i][j-1].destroy()){
+        if(j-2<=0){
+            if(player1.i == i && player1.j == j-2){return false;}
+            else{map[i][j-2].destroy();}
+        }
     }
-    console.log(map[i][j+1]);
-    if(map[i][j+1].destroy()){
-        map[i][j+2].destroy();
+    if(j+1<=11 && !map[i][j+1].destroy()){
+        if(j+2<=11){
+            if(player1.i == i && player1.j == j+2){return false;}
+            else{map[i][j+2].destroy();}
+        }
     }
+    return true;
 }
 
 let win = function (){
@@ -93,34 +102,53 @@ let win = function (){
     context.drawImage(victory_screen,0,0);
 }
 
+let loose = function (){
+    let v = new Image();
+    v.src = "sprites/decor/victory.png";
+    context.drawImage(v,0,0);
+    // console.log(v);
+}
+
 let draw = function (){
+    context.clearRect(0,0,canvas.width,canvas.height);
     let background = new Image();
     player = new Image();
     player.src = sprite_tab[player1.sprite];
     background.src = "sprites/decor/map.png";
     context.drawImage(background,0,0);
-    map.forEach(tab => {
-        tab.forEach(c => {
-            let o = c.getObj();
-            if (o != null){
-                let img = new Image();
-                if (o.isBomb()) { 
-                    o.sprite = o.sprite + 1;
-                    if (o.sprite == 180) {
-                        explosion(o.i, o.j); 
-                    } else {
-                        if (o.sprite%20 == 0) {
-                            o.src = sprites_bomb[o.getSprite(20)];
+    // console.log(background);
+    try {
+        map.forEach(tab => {
+            tab.forEach(c => {
+                let o = c.getObj();
+                if (o != null){
+                    let img = new Image();
+                    if (o.isBomb()) {   
+                        o.sprite = o.sprite + 1;
+                        if (o.sprite == 180) {
+                            if (!explosion(o.i, o.j)){ throw BreakException;} 
+                        } else {
+                            if (o.sprite%20 == 0) {
+                                o.src = sprites_bomb[o.getSprite(20)];
+                            }
                         }
                     }
+                    img.src = o.src;
+
+                    context.drawImage(img,o.x,o.y,o.width,o.height);
                 }
-                img.src = o.src;
-                
-                context.drawImage(img,o.x,o.y,o.width,o.height);
-            }
+            });
         });
-    });
-    context.drawImage(player,player1.x,player1.y,player1.width,player1.height);
+        context.drawImage(player,player1.x,player1.y,player1.width,player1.height);
+
+    } catch (e) {
+        if (e == BreakException){
+            clearInterval(int_id);
+            setTimeout(function(){}, 10000);
+            context.clearRect(0,0,canvas.width,canvas.height);
+            loose();
+        }
+    }
 }
 
 let collision = function(player){
@@ -196,5 +224,5 @@ let keyboard = function (e) {
 
 init_map();
 parser(json);
-setInterval(draw,16);
+let int_id = setInterval(draw,16);
 document.addEventListener("keydown", keyboard);

@@ -1,3 +1,4 @@
+
 class Objet {
     constructor(src, x, y, i, j, width, height, speed, sprite, destr){
         Object.defineProperty(this, "src", {value : src, writable : true});
@@ -18,7 +19,7 @@ class Objet {
                 obj.x + obj.width <= this.x || 
                 obj.y >= this.y + this.height || 
                 obj.y + obj.height <= this.y) )
-        }
+        } else if (obj.src == "sprites/decor/bomb1.png" || obj.src == "sprites/decor/bomb0.png") { return false; } 
         return(! (obj.x >= this.x + this.width || 
             obj.x + obj.width <= this.x || 
             obj.y >= this.y + this.height || 
@@ -48,5 +49,14 @@ class Objet {
 
     getSprite = function(val){
         return Math.trunc(this.sprite/val)%2; 
+    }
+
+    inRange = function(i, j){
+        return ( 
+        (this.i == i && this.j == j) || 
+        (this.i == i+1 && this.j == j) ||
+        (this.i == i-1 && this.j == j) ||
+        (this.i == i && this.j == j+1) ||
+        (this.i == i && this.j == j-1) );
     }
 }
