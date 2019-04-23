@@ -27,7 +27,14 @@ class Objet {
     }
 
     getCollision = function(){
-        return {x:this.x, y:this.y, width:this.width, height:this.height, win:this.src=="sprites/decor/victory1.png"};
+        if(this.src == "sprites/decor/victory1.png"){
+            return {x:this.x, y:this.y, width:this.width, height:this.height, win:1};
+        }
+        else if(this.src == "sprites/decor/explosion0.png" || this.src == "sprites/decor/explosion1_w.png" ||this.src == "sprites/decor/explosion1_h.png" || this.src == "sprites/decor/explosion2_u.png" ||
+        this.src == "sprites/decor/explosion2_d.png" || this.src == "sprites/decor/explosion2_r.png"|| this.src == "sprites/decor/explosion2_l.png"){
+            return {x:this.x, y:this.y, width:this.width, height:this.height, win:2};
+        }
+        return {x:this.x, y:this.y, width:this.width, height:this.height, win:0};
     }
 
     dropBomb = function(){
@@ -45,6 +52,13 @@ class Objet {
 
     isBomb = function(){
         return (this.src == "sprites/decor/bomb0.png" || this.src == "sprites/decor/bomb1.png");
+    }
+
+    isExplosion = function(){
+        return (this.src == "sprites/decor/explosion0.png" || this.src == "sprites/decor/explosion1_w.png" ||
+        this.src == "sprites/decor/explosion1_h.png" || this.src == "sprites/decor/explosion2_u.png" ||
+        this.src == "sprites/decor/explosion2_d.png" || this.src == "sprites/decor/explosion2_r.png"||
+        this.src == "sprites/decor/explosion2_l.png");
     }
 
     getSprite = function(val){
