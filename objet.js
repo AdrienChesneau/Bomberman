@@ -27,7 +27,7 @@ class Objet {
     }
 
     getCollision = function(){
-        return {x:this.x, y:this.y, width:this.width, height:this.height};
+        return {x:this.x, y:this.y, width:this.width, height:this.height, win:this.src=="sprites/decor/victory1.png"};
     }
 
     dropBomb = function(){

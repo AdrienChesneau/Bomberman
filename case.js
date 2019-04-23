@@ -20,8 +20,11 @@ class Case {
     destroy = function(){
         if (this.objet != null){
             if(this.objet.destr){
-                console.log(this.objet.i+" "+this.objet.j);
-                this.objet = null;
+                if(this.objet.src == "sprites/decor/victory0.png"){
+                    this.objet.src = "sprites/decor/victory1.png";
+                    this.objet.destr = false;
+                }
+                else{this.objet = null;}
             }
             return true;
         }

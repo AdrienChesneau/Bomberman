@@ -1,6 +1,7 @@
 let canvas = document.getElementById("cvn");
 let context = canvas.getContext("2d");
 let BreakException = {};
+let draw_seq;
 // let player1 = new Objet("player1.png", 10, 10, 0, 0, 15, 22, 8, true);
 let player1 = new Objet("sprites/player1/forward0.png", 10, 10, 0, 0, 32, 48, 8, 0, true);
 let map = [];
@@ -56,7 +57,7 @@ let parser= function(pathname){
                 map[i][j].addObj(tree);
             }
             if(lvl[k]==3){
-                victory = new Objet("sprites/decor/tree.png", j*50, i*50, i, j, 50, 50, 0, 0, true);
+                victory = new Objet("sprites/decor/victory0.png", j*50, i*50, i, j, 50, 50, 0, 0, true);
                 map[i][j].addObj(victory);
             }
             k++;
@@ -97,15 +98,17 @@ let explosion = function(i, j){
 }
 
 let win = function (){
-    let victory_screen = new Image();
-    victory_screen.src= "sprites/decor/victory_screen.png";
-    context.drawImage(victory_screen,0,0);
+    let v = new Image();
+    v.src = "sprites/decor/victory.png";
+    context.drawImage(v,0,0);
+    clearInterval(draw_seq);
 }
 
 let loose = function (){
     let v = new Image();
     v.src = "sprites/decor/victory.png";
     context.drawImage(v,0,0);
+    clearInterval(draw_seq);
     // console.log(v);
 }
 
@@ -144,15 +147,15 @@ let draw = function (){
     } catch (e) {
         if (e == BreakException){
             clearInterval(int_id);
-            setTimeout(function(){}, 10000);
             context.clearRect(0,0,canvas.width,canvas.height);
-            loose();
+            drawseq = setInterval(loose,16);
+
         }
     }
 }
 
 let collision = function(player){
-    let pos = {x:-1, y:-1, width:-1, height:-1}
+    let pos = {x:-1, y:-1, width:-1, height:-1, win:false};
     map.forEach(tab => {
         tab.forEach(c =>{
             if (c.objet != null && player.hasCollision(c.objet)){
@@ -176,7 +179,12 @@ let keyboard = function (e) {
             sprite_tab = backward_tab;
             player1.y= player1.y-player1.speed; 
             pos = collision(player1, map);
-            if(pos.x !== -1 || pos.y !== -1){
+            if (pos.win){
+                clearInterval(int_id);
+                context.clearRect(0,0,canvas.width,canvas.height);
+                drawseq = setInterval(win,16);
+            }
+            else if(pos.x !== -1 || pos.y !== -1){
                 player1.y = pos.y + Math.trunc(pos.height/2) + 1
             }
             player1.updateCoord();
@@ -186,7 +194,12 @@ let keyboard = function (e) {
             sprite_tab = left_tab;
             player1.x= player1.x-player1.speed;
             pos = collision(player1, map);
-            if(pos.x !== -1 || pos.y !== -1){
+            if (pos.win){
+                clearInterval(int_id);
+                context.clearRect(0,0,canvas.width,canvas.height);
+                drawseq = setInterval(win,16);
+            }
+            else if(pos.x !== -1 || pos.y !== -1){
                 player1.x = pos.x+pos.width; 
             }
             player1.updateCoord();
@@ -196,7 +209,12 @@ let keyboard = function (e) {
             sprite_tab = forward_tab;
             player1.y= player1.y+player1.speed;
             pos = collision(player1, map);
-            if(pos.x !== -1 || pos.y !== -1){
+            if (pos.win){
+                clearInterval(int_id);
+                context.clearRect(0,0,canvas.width,canvas.height);
+                drawseq = setInterval(win,16);
+            }
+            else if(pos.x !== -1 || pos.y !== -1){
                 player1.y = pos.y-player.height; 
             }
             player1.updateCoord();
@@ -206,7 +224,12 @@ let keyboard = function (e) {
             sprite_tab = right_tab;
             player1.x= player1.x+player1.speed;
             pos = collision(player1, map);
-            if(pos.x !== -1 || pos.y !== -1){
+            if (pos.win){
+                clearInterval(int_id);
+                context.clearRect(0,0,canvas.width,canvas.height);
+                drawseq = setInterval(win,16);
+            }
+            else if(pos.x !== -1 || pos.y !== -1){
                 player1.x= pos.x-player.width; 
             }
             player1.updateCoord();
