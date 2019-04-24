@@ -21,8 +21,9 @@ class Case {
         if (this.objet != null){
             if(this.objet.destr){
                 if(this.objet.src == "sprites/decor/victory0.png"){
-                    this.objet.src = "sprites/decor/victory1.png";
-                    this.objet.destr = false;
+                    victory = new Objet("sprites/decor/victory1.png", this.objet.x, this.objet.y, this.objet.i, this.objet.j, 50, 50, 0, 0, false);
+                    map[victory.i][victory.j].removeObj();
+                    map[victory.i][victory.j].addObj(victory);
                 }
                 else{this.objet = null;}
             }

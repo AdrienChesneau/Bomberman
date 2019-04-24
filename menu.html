@@ -1,0 +1,43 @@
+<html>
+  <head>
+    <title>Menu</title>
+  </head>
+  <body>
+    <canvas id="cvn" width="800" height="600">
+    </canvas>
+    <script>
+      let canvas = document.getElementById("cvn");
+      let context = canvas.getContext("2d");
+      let player = "war";
+
+      let draw = function (){
+        context.clearRect(0,0,canvas.width,canvas.height);
+        background = new Image();
+        let war = new Image();
+        let wizard = new Image();
+        background.src = "sprites/decor/menu.png";
+        war.src = "sprites/war/forward0.png";
+        wizard.src = "sprites/wizard/forward0.png";
+        context.drawImage(background,0,0);
+        if(player=='war'){context.drawImage(war,300,100,96,146);}
+        if(player=='wizard'){context.drawImage(wizard,400,100,96,146);}
+      }
+
+      let keyboard = function (e) {
+        switch(e.keyCode){
+          case 13:
+            window.location='index.html?player='+player;
+            break
+          case 81:
+            player = 'war';
+            break
+          case 68:
+            player = 'wizard';
+            break
+        }
+      }
+      setInterval(draw,1000/60);
+      document.addEventListener("keydown", keyboard);  
+    </script>
+  </body>
+</html>
