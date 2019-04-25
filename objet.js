@@ -1,6 +1,6 @@
 
 class Objet {
-    constructor(src, x, y, i, j, width, height, speed, sprite, destr){
+    constructor(src, x, y, i, j, width, height, speed, sprite, destr, type){
         Object.defineProperty(this, "src", {value : src, writable : true});
         Object.defineProperty(this, "x", {value : x, writable : true});
         Object.defineProperty(this, "y", {value : y, writable : true});
@@ -11,34 +11,37 @@ class Objet {
         Object.defineProperty(this, "speed", {value : speed, writable : false});
         Object.defineProperty(this, "sprite", {value : sprite, writable : true});
         Object.defineProperty(this, "destr", {value : destr, writable : false});
+        Object.defineProperty(this, "type", {value : type, writable : false});
     }
 
     hasCollision = function(obj){
-        if(obj.src==""){
+        if(obj.type=="wall"){
             return(! (obj.x >= this.x + this.width || 
                 obj.x + obj.width <= this.x || 
                 obj.y >= this.y + this.height || 
                 obj.y + obj.height <= this.y) )
-        } else if (obj.src == "sprites/decor/bomb1.png" || obj.src == "sprites/decor/bomb0.png") { return false; } 
-        return(! (obj.x >= this.x + this.width || 
+        } else if (obj.type == "bomb") { 
+            return false; 
+        } else {
+            return(! (obj.x >= this.x + this.width || 
             obj.x + obj.width <= this.x || 
             obj.y >= this.y + this.height || 
             obj.y + obj.height <= this.y+(Math.trunc(this.height/2)+1)) )
+        }
     }
 
     getCollision = function(){
-        if(this.src == "sprites/decor/victory1.png"){
+        if(this.type=="victory"){
             return {x:this.x, y:this.y, width:this.width, height:this.height, win:1};
         }
-        else if(this.src == "sprites/decor/explosion0.png" || this.src == "sprites/decor/explosion1_w.png" ||this.src == "sprites/decor/explosion1_h.png" || this.src == "sprites/decor/explosion2_u.png" ||
-        this.src == "sprites/decor/explosion2_d.png" || this.src == "sprites/decor/explosion2_r.png"|| this.src == "sprites/decor/explosion2_l.png"){
+        else if(this.type=="explosion"){
             return {x:this.x, y:this.y, width:this.width, height:this.height, win:2};
         }
         return {x:this.x, y:this.y, width:this.width, height:this.height, win:0};
     }
 
     dropBomb = function(){
-        return new Objet("sprites/decor/bomb0.png", (this.j*50)+10, (this.i*50)+10, this.i, this.j, 30, 30, 0, 0, false);
+        return new Objet(sprites_bomb[0], (this.j*50)+10, (this.i*50)+10, this.i, this.j, 30, 30, 0, 0, false,"bomb");
     }
 
     getCoord = function(){
@@ -51,14 +54,11 @@ class Objet {
     }
 
     isBomb = function(){
-        return (this.src == "sprites/decor/bomb0.png" || this.src == "sprites/decor/bomb1.png");
+        return (this.type=="bomb");
     }
 
     isExplosion = function(){
-        return (this.src == "sprites/decor/explosion0.png" || this.src == "sprites/decor/explosion1_w.png" ||
-        this.src == "sprites/decor/explosion1_h.png" || this.src == "sprites/decor/explosion2_u.png" ||
-        this.src == "sprites/decor/explosion2_d.png" || this.src == "sprites/decor/explosion2_r.png"||
-        this.src == "sprites/decor/explosion2_l.png");
+        return (this.type=="explosion");
     }
 
     getSprite = function(val){

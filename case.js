@@ -20,8 +20,8 @@ class Case {
     destroy = function(){
         if (this.objet != null){
             if(this.objet.destr){
-                if(this.objet.src == "sprites/decor/victory0.png"){
-                    victory = new Objet("sprites/decor/victory1.png", this.objet.x, this.objet.y, this.objet.i, this.objet.j, 50, 50, 0, 0, false);
+                if(this.objet.type=="block_victory"){
+                    let victory = new Objet(victory_sprites[1], this.objet.x, this.objet.y, this.objet.i, this.objet.j, 50, 50, 0, 0, false,"victory");
                     map[victory.i][victory.j].removeObj();
                     map[victory.i][victory.j].addObj(victory);
                 }

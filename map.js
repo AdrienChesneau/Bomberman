@@ -1,55 +1,26 @@
 let canvas = document.getElementById("cvn");
 let context = canvas.getContext("2d");
-let url = document.location.href;
-let classe = url.substr(url.lastIndexOf("player=")+7);
-let player1 = new Objet("sprites/"+classe+"/forward0.png", 10, 10, 0, 0, 32, 48, 8, 0, true);
+let player1 = new Objet(loadImageToCanvas("sprites/"+classe+"/forward0.png"), 10, 10, 0, 0, 32, 48, 8, 0, true, "player");
 let BreakException = {};
 let int_id;
-let draw_seq;
-let time = 100000;
+let json;
+let time = 60;
 let map = [];
 let walls = [];
-let forward_tab = [];
-let backward_tab = [];
-let left_tab = [];
-let right_tab = [];
-let loose_tab = [];
-let victory_tab = [];
 let level = 1;
-for(let i=0; i<9; i++){
-    forward_tab.push("sprites/"+classe+"/forward"+i+".png");
-    backward_tab.push("sprites/"+classe+"/backward"+i+".png");
-    left_tab.push("sprites/"+classe+"/left"+i+".png");
-    right_tab.push("sprites/"+classe+"/right"+i+".png");
-    loose_tab.push("fall"+i+".png");
-    victory_tab.push("sprites/"+classe+"/victory"+i+".png");
-}
+
+
 let sprite_tab = forward_tab;
 
-let sprites_bomb = ["sprites/decor/bomb0.png", "sprites/decor/bomb1.png"];
-
-let wall1 = new Objet("", 0, 0, 0, 0, 800, 0, 0, false);
-
-let wall2 = new Objet("", 800, 0, 0, 0, 0, 600, 0, false);
-let wall3 = new Objet("", 0, 600, 0, 0, 800, 0, 0, false);
-let wall4 = new Objet("", 0, 0, 0, 0, 0, 600, 0, false);
+let wall1 = new Objet("", 0, 0, 0, 0, 800, 0, 0, 0,false,"wall");
+let wall2 = new Objet("", 800, 0, 0, 0, 0, 600, 0, 0,false,"wall");
+let wall3 = new Objet("", 0, 600, 0, 0, 800, 0, 0, 0,false,"wall");
+let wall4 = new Objet("", 0, 0, 0, 0, 0, 600, 0, 0,false,"wall");
 walls.push(wall1);
 walls.push(wall2);
 walls.push(wall3);
 walls.push(wall4);
 
-let level1 = '{ "lvl1" : "000000000000000001210121121012100000000000000000012101211210121000000000000000000121012112101210012101211310121000000000000000000121012112101210000000000000000001210121121012100000000000000000" }';
-let level2 = '{ "lvl1" : "012101211310121000000000000000000121012112101210000000000000000001210121121012100000000000000000000000000000000001210121121012100000000000000000012101211210121000000000000000000121012112101210" }';
-
-/*let json;
-var requestURL= 'http://localhost::9000.com';
-var request = new XMLHttpRequest();
-request.open('GET', requestURL);
-request.responseType = 'json';
-request.send();
-request.onload = function() {
-    json = request.response;
-}*/
 
 let init_map = function(){
     for(let i = 0; i < 12; i++){
@@ -62,21 +33,19 @@ let init_map = function(){
 
 let parser= function(pathname){
    /* Parsing de data.json qui renvoie une liste pour l'instant, les blocs */
-   let data = JSON.parse(pathname);
-   let lvl = data.lvl1;
    let k = 0;
    for(let i=0; i<map.length; i++){
        for (let j = 0; j < map[i].length; j++){
-            if(lvl[k]==1){
-                block = new Objet("sprites/decor/block.png", j*50, i*50, i, j, 50, 50, 0, 0, false);
+            if(pathname[k]==1){
+                block = new Objet(block_sprites, j*50, i*50, i, j, 50, 50, 0, 0, false,"block");
                 map[i][j].addObj(block);
             }
-            if(lvl[k]==2){
-                tree = new Objet("sprites/decor/tree.png", j*50, i*50, i, j, 50, 50, 0, 0, true);
+            if(pathname[k]==2){
+                tree = new Objet(tree_sprites, j*50, i*50, i, j, 50, 50, 0, 0, true,"tree");
                 map[i][j].addObj(tree);
             }
-            if(lvl[k]==3){
-                victory = new Objet("sprites/decor/victory0.png", j*50, i*50, i, j, 50, 50, 0, 0, true);
+            if(pathname[k]==3){
+                victory = new Objet(victory_sprites[0], j*50, i*50, i, j, 50, 50, 0, 0, true,"block_victory");
                 map[i][j].addObj(victory);
             }
             k++;
@@ -86,57 +55,57 @@ let parser= function(pathname){
 
 let explosion = function(i, j){
     map[i][j].removeObj();
-    map[i][j].addObj(new Objet("sprites/decor/explosion0.png", j*50, i*50, i, j, 50, 50, 0, 0, false));
+    map[i][j].addObj(new Objet(explosion_sprites[0], j*50, i*50, i, j, 50, 50, 0, 0, false,"explosion"));
     if(player1.inRange(i, j)){return false;}
     if(i-1>=0 && !map[i-1][j].destroy()){
-        map[i-1][j].addObj(new Objet("sprites/decor/explosion2_u.png", j*50, (i-1)*50, i-1, j, 50, 50, 0, 0, false));
+        map[i-1][j].addObj(new Objet(explosion_sprites[3], j*50, (i-1)*50, i-1, j, 50, 50, 0, 0, false,"explosion"));
         if(i-2>=0){
             if(player1.i == i-2 && player1.j == j){return false; }
             else{
                 if(!map[i-2][j].destroy()){
                     map[i-1][j].removeObj();
-                    map[i-1][j].addObj(new Objet("sprites/decor/explosion1_h.png", j*50, (i-1)*50, i-1, j, 50, 50, 0, 0, false));
-                    map[i-2][j].addObj(new Objet("sprites/decor/explosion2_u.png", j*50, (i-2)*50, i-2, j, 50, 50, 0, 0, false));
+                    map[i-1][j].addObj(new Objet(explosion_sprites[1], j*50, (i-1)*50, i-1, j, 50, 50, 0, 0, false,"explosion"));
+                    map[i-2][j].addObj(new Objet(explosion_sprites[3], j*50, (i-2)*50, i-2, j, 50, 50, 0, 0, false,"explosion"));
                 }
             }
         }
     }
     
     if(i+1<=11 && !map[i+1][j].destroy()){
-        map[i+1][j].addObj(new Objet("sprites/decor/explosion2_d.png", j*50, (i+1)*50, i+1, j, 50, 50, 0, 0, false));
+        map[i+1][j].addObj(new Objet(explosion_sprites[4], j*50, (i+1)*50, i+1, j, 50, 50, 0, 0, false,"explosion"));
         if(i+2<=11){
             if(player1.i == i+2 && player1.j == j){return false;}
             else{
                 if(!map[i+2][j].destroy()){
                     map[i+1][j].removeObj();
-                    map[i+1][j].addObj(new Objet("sprites/decor/explosion1_h.png", j*50, (i+1)*50, i+1, j, 50, 50, 0, 0, false));
-                    map[i+2][j].addObj(new Objet("sprites/decor/explosion2_d.png", j*50, (i+2)*50, i+2, j, 50, 50, 0, 0, false));
+                    map[i+1][j].addObj(new Objet(explosion_sprites[1], j*50, (i+1)*50, i+1, j, 50, 50, 0, 0, false,"explosion"));
+                    map[i+2][j].addObj(new Objet(explosion_sprites[4], j*50, (i+2)*50, i+2, j, 50, 50, 0, 0, false,"explosion"));
                 }
             }
         }
     }
     if(j-1>=0 && !map[i][j-1].destroy()){
-        map[i][j-1].addObj(new Objet("sprites/decor/explosion2_l.png", (j-1)*50, i*50, i, j-1, 50, 50, 0, 0, false));
+        map[i][j-1].addObj(new Objet(explosion_sprites[5], (j-1)*50, i*50, i, j-1, 50, 50, 0, 0, false,"explosion"));
         if(j-2>=0){
             if(player1.i == i && player1.j == j-2){return false;}
             else{
                 if(!map[i][j-2].destroy()){
                     map[i][j-1].removeObj();
-                    map[i][j-1].addObj(new Objet("sprites/decor/explosion1_w.png", (j-1)*50, i*50, i, j-1, 50, 50, 0, 0, false));
-                    map[i][j-2].addObj(new Objet("sprites/decor/explosion2_l.png", (j-2)*50, i*50, i, j-2, 50, 50, 0, 0, false));
+                    map[i][j-1].addObj(new Objet(explosion_sprites[2], (j-1)*50, i*50, i, j-1, 50, 50, 0, 0, false,"explosion"));
+                    map[i][j-2].addObj(new Objet(explosion_sprites[5], (j-2)*50, i*50, i, j-2, 50, 50, 0, 0, false,"explosion"));
                 }
             }
         }
     }
     if(j+1<=15 && !map[i][j+1].destroy()){
-        map[i][j+1].addObj(new Objet("sprites/decor/explosion2_r.png", (j+1)*50, i*50, i, j+1, 50, 50, 0, 0, false));
+        map[i][j+1].addObj(new Objet(explosion_sprites[6], (j+1)*50, i*50, i, j+1, 50, 50, 0, 0, false,"explosion"));
         if(j+2<=15){
             if(player1.i == i && player1.j == j+2){return false;}
             else{   
                 if(!map[i][j+2].destroy()){
                     map[i][j+1].removeObj();
-                    map[i][j+1].addObj(new Objet("sprites/decor/explosion1_w.png", (j+1)*50, i*50, i, j+1, 50, 50, 0, 0, false));
-                    map[i][j+2].addObj(new Objet("sprites/decor/explosion2_r.png", (j+2)*50, i*50, i, j+2, 50, 50, 0, 0, false));
+                    map[i][j+1].addObj(new Objet(explosion_sprites[2], (j+1)*50, i*50, i, j+1, 50, 50, 0, 0, false,"explosion"));
+                    map[i][j+2].addObj(new Objet(explosion_sprites[6], (j+2)*50, i*50, i, j+2, 50, 50, 0, 0, false,"explosion"));
                 }
             }
         }
@@ -147,25 +116,25 @@ let explosion = function(i, j){
 let win = function (){
     clearInterval(int_id);
     document.removeEventListener("keydown", keyboard);
-    context.clearRect(0,0,canvas.width,canvas.height);
+
     if(level==2){
         player1.sprite = 0;
         sprite_tab = victory_tab;
         let draw = function(){
-            context.clearRect(0,0,canvas.width,canvas.height);
-            let background = new Image();
-            let player = new Image();
-            background.src = "sprites/"+classe+"/win.png";
-            player.src = sprite_tab[player1.sprite];
-            context.drawImage(background,0,0);
-            context.drawImage(player,350,200,120,146);
+            context.drawImage(background_sprites[1],0,0);
+            context.drawImage(sprite_tab[player1.sprite],350,200,120,146);
             player1.sprite = (player1.sprite+1)%9;
         }
         setInterval(draw,1000/17);
     }
     else{
         level += 1;
-        main(level2);
+        player1.x = 10;
+        player1.y = 10;
+        player1.i = 0;
+        player1.j = 0;
+        player1.sprite = 0;
+        main(json[1].level);
     }
 }
 
@@ -173,25 +142,28 @@ let win = function (){
 let loose = function (){
     clearInterval(int_id);
     document.removeEventListener("keydown", keyboard);
-    context.clearRect(0,0,canvas.width,canvas.height);
-    let v = new Image();
-    v.onload = function(){context.drawImage(v,0,0);};
-    v.src = "sprites/"+classe+"/loose.png";
+    player1.sprite = 0;
+
+    let draw = function(){
+        sprite_tab = loose_tab;
+        context.drawImage(background_sprites[0],0,0);
+        context.drawImage(sprite_tab[player1.sprite],player1.x,player1.y);
+        player1.sprite+=1;
+        if(player1.sprite==8){
+            clearInterval(int_id);
+            context.drawImage(background_sprites[2],0,0);
+        }
+    }
+    int_id = setInterval(draw,1000/16);
 }
 
 let draw = function (){
-    context.clearRect(0,0,canvas.width,canvas.height);
-    background = new Image();
-    player = new Image();
-    player.src = sprite_tab[player1.sprite];
-    background.src = "sprites/decor/map.png";
-    context.drawImage(background,0,0);
+    context.drawImage(background_sprites[0],0,0);
     try {
         map.forEach(tab => {
             tab.forEach(c => {
                 let o = c.getObj();
                 if (o != null){
-                    let img = new Image();
                     if (o.isBomb()) {   
                         o.sprite = o.sprite + 1;
                         if (o.sprite == 180) {
@@ -207,20 +179,19 @@ let draw = function (){
                             map[o.i][o.j].removeObj();
                         }
                         o.sprite+=1;
+                        
                     }
-                    img.src = o.src;
 
-                    context.drawImage(img,o.x,o.y,o.width,o.height);
+                    context.drawImage(o.src,o.x,o.y,o.width,o.height);
                 }
             });
         });
-        context.drawImage(player,player1.x,player1.y,player1.width,player1.height);
-        time = time-0.016; 
+        context.drawImage(sprite_tab[player1.sprite],player1.x,player1.y,player1.width,player1.height);
+        time = time-0.016;
         document.getElementById('timer').innerHTML =Math.round(time);
         if(time<0){
             throw BreakException;
         }
-
     } catch (e) {
         if (e == BreakException){
             loose();
@@ -292,7 +263,7 @@ let keyboard = function (e) {
                 loose();
             }
             else if(pos.x !== -1 || pos.y !== -1){
-                player1.y = pos.y-player.height; 
+                player1.y = pos.y-player1.height; 
             }
             player1.updateCoord();
             break;
@@ -308,7 +279,7 @@ let keyboard = function (e) {
                 loose();
             }
             else if(pos.x !== -1 || pos.y !== -1){
-                player1.x= pos.x-player.width; 
+                player1.x= pos.x-player1.width; 
             }
             player1.updateCoord();
             break;
@@ -324,14 +295,25 @@ let keyboard = function (e) {
 };
 
 let main = function(json){
-    player1.x = 10;
-    player1.y = 10;
-    player1.i = 0;
-    player1.j = 0;
     init_map();
     parser(json);
     int_id = setInterval(draw,1000/60);
     document.addEventListener("keydown", keyboard);
 }
 
-main(level1);
+let init = async function(){
+    await load_tabs();
+
+    let req = new XMLHttpRequest();
+    req.open("get","data.json");
+    req.send();
+    req.addEventListener("readystatechange",function(e){
+        if(req.readyState==4){
+            json = JSON.parse(req.responseText);
+            main(json[0].level);
+        }
+    });
+}
+
+init();
+

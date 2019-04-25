@@ -11,16 +11,23 @@
       let player = "war";
 
       let draw = function (){
-        context.clearRect(0,0,canvas.width,canvas.height);
         background = new Image();
         let war = new Image();
         let wizard = new Image();
         background.src = "sprites/decor/menu.png";
-        war.src = "sprites/war/forward0.png";
-        wizard.src = "sprites/wizard/forward0.png";
         context.drawImage(background,0,0);
-        if(player=='war'){context.drawImage(war,300,100,96,146);}
-        if(player=='wizard'){context.drawImage(wizard,400,100,96,146);}
+        if(player=='war'){
+          war.src = "sprites/war/forward0.png";
+          wizard.src = "sprites/wizard/forward_shadow.png";
+          context.drawImage(war,300,100,96,146);
+          context.drawImage(wizard,400,100,96,146);
+        }
+        if(player=='wizard'){
+          wizard.src = "sprites/wizard/forward0.png";
+          war.src = "sprites/war/forward_shadow.png";
+          context.drawImage(wizard,400,100,96,146);
+          context.drawImage(war,300,100,96,146);
+        }
       }
 
       let keyboard = function (e) {
