@@ -22,6 +22,11 @@ class Objet {
                 obj.y + obj.height <= this.y) )
         } else if (obj.type == "bomb") { 
             return false; 
+        } else if(obj.type=="player"){
+            return(! (obj.x >= this.x + this.width || 
+                obj.x + obj.width <= this.x || 
+                obj.y >= this.y + this.height || 
+                obj.y + obj.height <= this.y) )
         } else {
             return(! (obj.x >= this.x + this.width || 
             obj.x + obj.width <= this.x || 

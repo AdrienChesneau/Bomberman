@@ -25,8 +25,19 @@ async function loadImageToCanvas(url) {
     return canvas;
   };
 
+let mode;
 let url = document.location.href;
+let classe2;
 let classe = url.substr(url.lastIndexOf("player=")+7);
+if (classe.indexOf("&")==-1){
+    mode = 1;
+} else {
+    mode = 2;
+    classe2 = classe.substr(classe.indexOf("&")+1);
+    classe =  classe.substr(0,classe.indexOf("&"));
+}
+
+
 let forward_tab = [];
 let backward_tab = [];
 let left_tab = [];
@@ -42,12 +53,22 @@ let explosion_sprites = [];
 
 async function load_tabs () {
     for(let i=0; i<9; i++){
-        forward_tab.push( await loadImageToCanvas("sprites/"+classe+"/forward"+i+".png"));
+        forward_tab.push(await loadImageToCanvas("sprites/"+classe+"/forward"+i+".png"));
         backward_tab.push(await loadImageToCanvas("sprites/"+classe+"/backward"+i+".png"));
         left_tab.push(await loadImageToCanvas("sprites/"+classe+"/left"+i+".png"));
         right_tab.push(await loadImageToCanvas("sprites/"+classe+"/right"+i+".png"));
         loose_tab.push(await loadImageToCanvas("sprites/"+classe+"/fall"+i+".png"));
         victory_tab.push(await loadImageToCanvas("sprites/"+classe+"/victory"+i+".png"));
+    }
+    if(mode == 2){
+        for(let i=0; i<9; i++){
+            forward_tab.push(await loadImageToCanvas("sprites/"+classe2+"/forward"+i+".png"));
+            backward_tab.push(await loadImageToCanvas("sprites/"+classe2+"/backward"+i+".png"));
+            left_tab.push(await loadImageToCanvas("sprites/"+classe2+"/left"+i+".png"));
+            right_tab.push(await loadImageToCanvas("sprites/"+classe2+"/right"+i+".png"));
+            loose_tab.push(await loadImageToCanvas("sprites/"+classe2+"/fall"+i+".png"));
+            victory_tab.push(await loadImageToCanvas("sprites/"+classe2+"/victory"+i+".png"));
+        }  
     }
     sprites_bomb = await Promise.all([loadImageToCanvas("sprites/decor/bomb0.png"), loadImageToCanvas("sprites/decor/bomb1.png")]);
     background_sprites = await Promise.all([loadImageToCanvas("sprites/decor/map.png"),loadImageToCanvas("sprites/decor/win.png"),loadImageToCanvas("sprites/"+classe+"/loose.png")]);
